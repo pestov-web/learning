@@ -1,7 +1,7 @@
-import { question, radioQuestion, checkboxQuestion } from './question';
+import { Question, RadioQuestion, CheckboxQuestion } from './question';
 import { FORM_CONTAINER, FORM_TEMPLATE } from './utils/constants';
 
-function testController(serviceUrl) {
+function TestController(serviceUrl) {
   this.questionsCount = 0;
   this.questionIndex = 0;
   this.questionsList = [];
@@ -42,59 +42,43 @@ function testController(serviceUrl) {
     return questionData;
   };
 
+  this.addQuestionToList = function (questionObj) {
+    this.questionsList.push(questionObj);
+  };
+
   // Создание объекта вопроса
   this.createNextQuestionObject = async function () {
     if (this.questionIndex < this.questionsCount) {
       console.log(`загружаем вопрос по индексу ${this.questionIndex}`);
       const data = await this.loadQuestion(this.questionIndex);
-      this.questionIndex += 1;
-      const options = data.options.split('#;');
-      const answers = data.answers.split('#;');
-      const questionObj = this.questionFactory(
-        data.text,
-        options,
-        answers,
-        (questionObj) => this.questionsList.push(questionObj)
-      );
-      questionObj.renderQuestion(questionObj);
+      const questionObj = this.questionFactory(data);
+      this.addQuestionToList(questionObj);
+      this.questionIndex++;
+      questionObj.init(() => {
+        this.createNextQuestionObject();
+      });
     } else {
       this.showResult();
     }
   };
 
-  this.questionFactory = function (text, options, answers) {
+  this.questionFactory = function (data) {
+    const answers = data.answers.split('#;');
+    let questionObj;
     if (answers.length === 1) {
       console.log('Радио-вопрос');
-      return new radioQuestion(
-        text,
-        options,
-        answers,
-        this.createNextQuestionObject.bind(this)
-      );
+      questionObj = new RadioQuestion(data);
     } else {
       console.log('Чекбокс-вопрос');
-      return new checkboxQuestion(
-        text,
-        options,
-        answers,
-        this.createNextQuestionObject.bind(this)
-      );
+      questionObj = new CheckboxQuestion(data);
     }
+    return questionObj;
   };
 
   // Метод показа результатов теста
   this.showResult = function () {
     console.log('Показываем результаты...');
-
-    console.log('Результат:', this.score);
-
-    const template = FORM_TEMPLATE.content.cloneNode(true);
-    template.querySelector(
-      '.question__text'
-    ).textContent = `ваш результат ${this.score} правильных ответов из ${this.questionsCount}`;
-    FORM_CONTAINER.innerHTML = '';
-    FORM_CONTAINER.appendChild(template);
   };
 }
 
-export default testController;
+export default TestController;

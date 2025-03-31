@@ -1,28 +1,32 @@
 // Конструктор базового вопроса
 import { FORM_CONTAINER, FORM_TEMPLATE } from './utils/constants';
 
-function question(text, options, answers, NextCallback) {
-  this.text = text;
-  this.options = options;
-  this.answers = answers;
-  this.NextCallback = NextCallback;
+function Question(data) {
+  this.text = data.text;
+  this.options = data.options.split('#;');
+  this.answers = data.answers.split('#;');
+  this.timeout = data.timeout;
   this.score = 0;
 
   // Метод вычисления результата
-  this.checkAnswers = function (selectedAnswers) {
+  this.getScore = function (selectedAnswers) {
     // Простая логика: если выбранные ответы совпадают с правильными, начисляем балл
     const correct = this.answers;
-    // сравниваем массивы
+    // сравниваем
     if (JSON.stringify(selectedAnswers) === JSON.stringify(correct)) {
       console.log('Правильно!');
-      this.score += 1;
+      return 1;
     }
+    console.log('Неправильно!');
+    return 0;
+  };
+
+  this.handleNext = function (selectedAnswers) {
+    // Получаем выбранные ответы
+    this.score += this.getScore(selectedAnswers);
     console.log('Результат:', this.score);
   };
 
-  this.getScore = function () {
-    return this.score;
-  };
   this.renderQuestion = function () {
     // Клонируем шаблон из index.html
     const template = FORM_TEMPLATE.content.cloneNode(true);
@@ -36,7 +40,7 @@ function question(text, options, answers, NextCallback) {
       const label = document.createElement('label');
 
       // В зависимости от типа вопроса выбираем radio или checkbox
-      input.type = this instanceof radioQuestion ? 'radio' : 'checkbox';
+      input.type = this instanceof RadioQuestion ? 'radio' : 'checkbox';
       input.name = 'option'; // для radio важно иметь одно имя
       input.value = option;
       input.id = `option${idx}`;
@@ -59,32 +63,22 @@ function question(text, options, answers, NextCallback) {
     nextButton.addEventListener('click', () => this.handleNext(this));
     FORM_CONTAINER.appendChild(nextButton);
   };
-
-  this.handleNext = function () {
-    // Получаем выбранные ответы
-    const inputs = FORM_CONTAINER.querySelectorAll('input');
-    const selectedAnswers = [];
-    inputs.forEach((input) => {
-      if (input.checked) selectedAnswers.push(input.value);
-    });
-
-    this.checkAnswers(selectedAnswers);
-    this.NextCallback();
-  };
 }
 
 // Конструктор для радио-вопроса
-function radioQuestion(text, options, answers, NextCallback) {
-  this.init = function () {
-    this.renderQuestion(this);
+function RadioQuestion(data) {
+  Question.call(this, data);
+  this.init = function (onNext) {
+    this.renderQuestion(this, onNext);
   };
 }
 
 // Конструктор для чекбокс-вопроса
-function checkboxQuestion(text, options, answers, NextCallback) {
-  this.init = function () {
-    this.renderQuestion(this);
+function CheckboxQuestion(data) {
+  Question.call(this, data);
+  this.init = function (onNext) {
+    this.renderQuestion(this, onNext);
   };
 }
 
-export { question, radioQuestion, checkboxQuestion };
+export { Question, RadioQuestion, CheckboxQuestion };
