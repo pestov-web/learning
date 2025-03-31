@@ -38,12 +38,13 @@ function testController(serviceUrl) {
   this.loadQuestion = async function (index) {
     const questionData = await this.ajaxToService(`GetNext/${index}`);
     if (!questionData) return;
+    return questionData;
   };
 
   // Создание объекта вопроса
-  this.createNextQuestionObject = function () {
+  this.createNextQuestionObject = async function () {
     console.log(`загружаем вопрос по индексу ${this.questionIndex}`);
-    const data = this.loadQuestion(this.questionIndex);
+    const data = await this.loadQuestion(this.questionIndex);
     this.questionIndex += 1;
     const options = data.options.split('#;');
     const answers = data.answers.split('#;');
