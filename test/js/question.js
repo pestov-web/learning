@@ -1,37 +1,42 @@
 // Конструктор базового вопроса
-function question(text, options, answers, timeout) {
+import { FORM_CONTAINER, FORM_TEMPLATE } from './utils/constants';
+
+function question(text, options, answers, NextCallback) {
   this.text = text;
   this.options = options;
   this.answers = answers;
-  this.timeout = timeout;
+  this.NextCallback = NextCallback;
   this.score = 0;
 
   // Метод вычисления результата
-  this.getScore = function (selectedAnswers) {
+  this.checkAnswers = function (selectedAnswers) {
     // Простая логика: если выбранные ответы совпадают с правильными, начисляем балл
     const correct = this.answers;
-    // Сортируем и сравниваем массивы
-    if (selectedAnswers.sort().join() === correct.sort().join()) {
-      return 1;
+    // сравниваем массивы
+    if (JSON.stringify(selectedAnswers) === JSON.stringify(correct)) {
+      console.log('Правильно!');
+      this.score += 1;
     }
-    return 0;
+    console.log('Результат:', this.score);
   };
-  this.renderQuestion = function (questionObj) {
+
+  this.getScore = function () {
+    return this.score;
+  };
+  this.renderQuestion = function () {
     // Клонируем шаблон из index.html
-    const template = document
-      .querySelector('.questions__template')
-      .content.cloneNode(true);
-    template.querySelector('.question__text').textContent = questionObj.text;
+    const template = FORM_TEMPLATE.content.cloneNode(true);
+    template.querySelector('.question__text').textContent = this.text;
 
     const optionsList = template.querySelector('.question__options');
     // Рендерим варианты ответа
-    questionObj.options.forEach((option, idx) => {
+    this.options.forEach((option, idx) => {
       const li = document.createElement('li');
       const input = document.createElement('input');
       const label = document.createElement('label');
 
       // В зависимости от типа вопроса выбираем radio или checkbox
-      input.type = questionObj instanceof radioQuestion ? 'radio' : 'checkbox';
+      input.type = this instanceof radioQuestion ? 'radio' : 'checkbox';
       input.name = 'option'; // для radio важно иметь одно имя
       input.value = option;
       input.id = `option${idx}`;
@@ -51,11 +56,11 @@ function question(text, options, answers, timeout) {
     // Привязываем обработчик для кнопки «Следующий»
     const nextButton = document.createElement('button');
     nextButton.textContent = 'Следующий';
-    nextButton.addEventListener('click', () => this.handleNext(questionObj));
+    nextButton.addEventListener('click', () => this.handleNext(this));
     FORM_CONTAINER.appendChild(nextButton);
   };
 
-  this.handleNext = function (questionObj) {
+  this.handleNext = function () {
     // Получаем выбранные ответы
     const inputs = FORM_CONTAINER.querySelectorAll('input');
     const selectedAnswers = [];
@@ -63,31 +68,23 @@ function question(text, options, answers, timeout) {
       if (input.checked) selectedAnswers.push(input.value);
     });
 
-    // Вычисляем баллы. Метод getScore можно реализовать в вопросах
-    questionObj.score = questionObj.getScore(selectedAnswers);
-
-    // Если еще есть вопросы – загружаем следующий, иначе показываем результаты
-    this.questionIndex++;
-    if (this.questionIndex < this.questionsCount) {
-      this.loadQuestion(this.questionIndex);
-    } else {
-      this.showResult();
-    }
+    this.checkAnswers(selectedAnswers);
+    this.NextCallback();
   };
 }
 
 // Конструктор для радио-вопроса
-function radioQuestion(text, options, answers, timeout) {
-  // Наследуем свойства от question
-  question.call(this, text, options, answers, timeout);
-  // Можно добавить специфичную логику для радио-вопроса, если нужно
-  this.renderQuestion(questionObj);
+function radioQuestion(text, options, answers, NextCallback) {
+  this.init = function () {
+    this.renderQuestion(this);
+  };
 }
 
 // Конструктор для чекбокс-вопроса
-function checkboxQuestion(text, options, answers, timeout) {
-  question.call(this, text, options, answers, timeout);
-  this.renderQuestion(questionObj);
+function checkboxQuestion(text, options, answers, NextCallback) {
+  this.init = function () {
+    this.renderQuestion(this);
+  };
 }
 
-export { radioQuestion, checkboxQuestion };
+export { question, radioQuestion, checkboxQuestion };
