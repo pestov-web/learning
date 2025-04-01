@@ -1,5 +1,5 @@
 import { Question, RadioQuestion, CheckboxQuestion } from './question';
-import { FORM_CONTAINER, FORM_TEMPLATE } from './utils/constants';
+import { FORM_CONTAINER } from './utils/constants';
 
 function TestController(serviceUrl) {
   this.questionsCount = 0;
@@ -24,13 +24,9 @@ function TestController(serviceUrl) {
     // Запрашиваем количество вопросов
     const count = await this.ajaxToService('TestInit');
     if (count == null) return;
-    console.log('Количество вопросов:', count);
     this.questionsCount = count;
     this.questionIndex = 0;
     this.questionsList = [];
-    console.log(
-      'Инициализация прошла, данные сброшены, вызываем createNextQuestionObject'
-    );
     this.createNextQuestionObject();
   };
 
@@ -48,7 +44,6 @@ function TestController(serviceUrl) {
   // Создание объекта вопроса
   this.createNextQuestionObject = async function () {
     if (this.questionIndex < this.questionsCount) {
-      console.log(`загружаем вопрос по индексу ${this.questionIndex}`);
       const data = await this.loadQuestion(this.questionIndex);
       const questionObj = this.questionFactory(data);
       this.questionIndex++;
@@ -64,22 +59,16 @@ function TestController(serviceUrl) {
     Question.prototype.addQuestionToList = this.addQuestionToList.bind(this);
 
     RadioQuestion.prototype = Object.create(Question.prototype);
-    RadioQuestion.prototype.constructor = RadioQuestion;
-
     CheckboxQuestion.prototype = Object.create(Question.prototype);
-    CheckboxQuestion.prototype.constructor = CheckboxQuestion;
 
     const answers = data.answers.split('#;');
 
     if (answers.length === 1) {
-      console.log('Радио-вопрос');
       questionObj = new RadioQuestion(data);
     } else {
-      console.log('Чекбокс-вопрос');
       questionObj = new CheckboxQuestion(data);
     }
 
-    console.log('questionObj: ', questionObj);
     questionObj.init();
     return questionObj;
   };
