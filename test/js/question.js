@@ -63,7 +63,6 @@ function Question(data) {
         options: this.options,
         answers: this.answers,
       });
-
       this.handleNext(this);
     });
     FORM_CONTAINER.appendChild(nextButton);
