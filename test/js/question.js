@@ -63,7 +63,7 @@ function Question(data) {
         options: this.options,
         answers: this.answers,
       });
-      FORM_CONTAINER.innerHTML = '';
+
       this.handleNext(this);
     });
     FORM_CONTAINER.appendChild(nextButton);
