@@ -2,7 +2,6 @@
 import { FORM_CONTAINER, FORM_TEMPLATE } from './utils/constants';
 
 function Question(data) {
-  this.id = data.id;
   this.text = data.text;
   this.options = data.options.split('#;');
   this.answers = data.answers.split('#;');
