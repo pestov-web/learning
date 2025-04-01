@@ -1,20 +1,24 @@
-function question() {
-  this.score = 0;
-  this.returnScore = function () {
-    return this.score;
+function ClassParent() {
+  this.handleNext = function () {
+    console.log('handleNext of parent');
+  };
+  this.handleNext2 = function () {
+    console.log('handleNext2 of parent');
   };
 }
 
-// Конструктор для радио-вопроса
-function radioQuestion(num) {
-  this.num = num;
-  this.score = 5;
+function ClassChild() {
+  // Вызываем конструктор родителя
+  ClassParent.call(this);
+  this.handleNext = function () {
+    console.log('handleNext of child');
+    ClassParent.prototype.handleNext.call(this);
+  };
 }
 
-// Наследуем методы базового класса
-radioQuestion.prototype = Object.create(question.prototype);
-// radioQuestion.prototype.constructor = radioQuestion;
-const que = new question();
-const radio = new radioQuestion(1);
+ClassChild.prototype = Object.create(ClassParent.prototype);
+ClassChild.prototype.constructor = ClassChild;
 
-console.log(que.returnScore());
+const child = new ClassChild();
+
+child.handleNext();

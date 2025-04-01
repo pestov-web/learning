@@ -6,7 +6,6 @@ function TestController(serviceUrl) {
   this.questionIndex = 0;
   this.questionsList = [];
   this.serviceUrl = serviceUrl;
-  this.score = 0;
 
   this.ajaxToService = async function (endpoint) {
     try {
@@ -52,19 +51,26 @@ function TestController(serviceUrl) {
       console.log(`загружаем вопрос по индексу ${this.questionIndex}`);
       const data = await this.loadQuestion(this.questionIndex);
       const questionObj = this.questionFactory(data);
-      this.addQuestionToList(questionObj);
       this.questionIndex++;
-      questionObj.init(() => {
-        this.createNextQuestionObject();
-      });
     } else {
       this.showResult();
     }
   };
 
   this.questionFactory = function (data) {
-    const answers = data.answers.split('#;');
     let questionObj;
+
+    Question.prototype.handleNext = this.createNextQuestionObject.bind(this);
+    Question.prototype.addQuestionToList = this.addQuestionToList.bind(this);
+
+    RadioQuestion.prototype = Object.create(Question.prototype);
+    RadioQuestion.prototype.constructor = RadioQuestion;
+
+    CheckboxQuestion.prototype = Object.create(Question.prototype);
+    CheckboxQuestion.prototype.constructor = CheckboxQuestion;
+
+    const answers = data.answers.split('#;');
+
     if (answers.length === 1) {
       console.log('Радио-вопрос');
       questionObj = new RadioQuestion(data);
@@ -72,12 +78,26 @@ function TestController(serviceUrl) {
       console.log('Чекбокс-вопрос');
       questionObj = new CheckboxQuestion(data);
     }
+
+    console.log('questionObj: ', questionObj);
+    questionObj.init();
     return questionObj;
   };
 
   // Метод показа результатов теста
   this.showResult = function () {
-    console.log('Показываем результаты...');
+    const sumOfScores = this.questionsList.reduce(
+      (accumulator, currentValue) => {
+        return accumulator + currentValue.score;
+      },
+      0
+    );
+    FORM_CONTAINER.innerHTML =
+      '<h2 class="questions__result">Результат: ' +
+      sumOfScores +
+      ' из ' +
+      this.questionsCount +
+      '</h2>';
   };
 }
 

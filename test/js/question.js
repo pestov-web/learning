@@ -2,6 +2,7 @@
 import { FORM_CONTAINER, FORM_TEMPLATE } from './utils/constants';
 
 function Question(data) {
+  this.id = data.id;
   this.text = data.text;
   this.options = data.options.split('#;');
   this.answers = data.answers.split('#;');
@@ -10,9 +11,8 @@ function Question(data) {
 
   // Метод вычисления результата
   this.getScore = function (selectedAnswers) {
-    // Простая логика: если выбранные ответы совпадают с правильными, начисляем балл
     const correct = this.answers;
-    // сравниваем
+
     if (JSON.stringify(selectedAnswers) === JSON.stringify(correct)) {
       console.log('Правильно!');
       return 1;
@@ -21,14 +21,8 @@ function Question(data) {
     return 0;
   };
 
-  this.handleNext = function (selectedAnswers) {
-    // Получаем выбранные ответы
-    this.score += this.getScore(selectedAnswers);
-    console.log('Результат:', this.score);
-  };
-
   this.renderQuestion = function () {
-    // Клонируем шаблон из index.html
+    FORM_CONTAINER.innerHTML = '';
     const template = FORM_TEMPLATE.content.cloneNode(true);
     template.querySelector('.question__text').textContent = this.text;
 
@@ -54,13 +48,25 @@ function Question(data) {
     });
 
     // Очищаем контейнер и добавляем новый вопрос
-    FORM_CONTAINER.innerHTML = '';
     FORM_CONTAINER.appendChild(template);
 
     // Привязываем обработчик для кнопки «Следующий»
     const nextButton = document.createElement('button');
     nextButton.textContent = 'Следующий';
-    nextButton.addEventListener('click', () => this.handleNext(this));
+    nextButton.addEventListener('click', () => {
+      const inputs = FORM_CONTAINER.querySelectorAll('input:checked');
+      const selectedAnswers = Array.from(inputs).map((input) => input.value);
+      console.log('selectedAnswers: ', selectedAnswers);
+      this.score = this.getScore(selectedAnswers);
+      this.addQuestionToList({
+        score: this.score,
+        text: this.text,
+        options: this.options,
+        answers: this.answers,
+      });
+      FORM_CONTAINER.innerHTML = '';
+      this.handleNext(this);
+    });
     FORM_CONTAINER.appendChild(nextButton);
   };
 }
@@ -68,16 +74,16 @@ function Question(data) {
 // Конструктор для радио-вопроса
 function RadioQuestion(data) {
   Question.call(this, data);
-  this.init = function (onNext) {
-    this.renderQuestion(this, onNext);
+  this.init = function () {
+    this.renderQuestion();
   };
 }
 
 // Конструктор для чекбокс-вопроса
 function CheckboxQuestion(data) {
   Question.call(this, data);
-  this.init = function (onNext) {
-    this.renderQuestion(this, onNext);
+  this.init = function () {
+    this.renderQuestion();
   };
 }
 
