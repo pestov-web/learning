@@ -13,10 +13,8 @@ function Question(data) {
     const correct = this.answers;
 
     if (JSON.stringify(selectedAnswers) === JSON.stringify(correct)) {
-      console.log('Правильно!');
       return 1;
     }
-    console.log('Неправильно!');
     return 0;
   };
 
@@ -55,7 +53,6 @@ function Question(data) {
     nextButton.addEventListener('click', () => {
       const inputs = FORM_CONTAINER.querySelectorAll('input:checked');
       const selectedAnswers = Array.from(inputs).map((input) => input.value);
-      console.log('selectedAnswers: ', selectedAnswers);
       this.score = this.getScore(selectedAnswers);
       this.addQuestionToList({
         score: this.score,
