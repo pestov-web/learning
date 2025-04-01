@@ -59,7 +59,9 @@ function TestController(serviceUrl) {
     Question.prototype.addQuestionToList = this.addQuestionToList.bind(this);
 
     RadioQuestion.prototype = Object.create(Question.prototype);
+    RadioQuestion.prototype.constructor = RadioQuestion;
     CheckboxQuestion.prototype = Object.create(Question.prototype);
+    CheckboxQuestion.prototype.constructor = CheckboxQuestion;
 
     const answers = data.answers.split('#;');
 
