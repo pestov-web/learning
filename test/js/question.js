@@ -24,7 +24,7 @@ function Question(data) {
     template.querySelector('.question__text').textContent = this.text;
 
     const optionsList = template.querySelector('.question__options');
-    // Рендерим варианты ответа
+    // Рендер вариантов ответа
     this.options.forEach((option, idx) => {
       const li = document.createElement('li');
       const input = document.createElement('input');
