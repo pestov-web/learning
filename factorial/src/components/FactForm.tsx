@@ -13,7 +13,7 @@ function FactForm() {
     if (inputRef.current?.value) {
       const value = Number(inputRef.current.value);
       // тут можно поменять валидацию на yup, регулярку итд
-      if (Number.isInteger(value) && value >= 0 && value <= 5000) {
+      if (value >= 0 && value <= 5000) {
         const num: number = value;
         const result: number = getFact(num);
         setFactResult(result);
@@ -31,7 +31,11 @@ function FactForm() {
         <label htmlFor="number" className="form__label">
           Факториал
         </label>
-        <input ref={inputRef} className={'input input_' + theme} />
+        <input
+          type="number"
+          ref={inputRef}
+          className={'input input_' + theme}
+        />
         <input
           type="submit"
           value="Вычислить"
