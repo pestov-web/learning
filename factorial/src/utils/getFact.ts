@@ -1,25 +1,24 @@
-function calculateFactorial(n: number): number {
-  if (n <= 1) {
-    return 1;
-  }
-  return n * calculateFactorial(n - 1);
-}
-
-function cachingDecorator(func: (x: number) => number) {
+function memoizedFactorial() {
   const cache: Map<number, number> = new Map();
 
-  return function (x: number) {
-    if (cache.has(x)) {
-      console.log('get from cache');
-      return cache.get(x);
+  function factorial(n: number): number {
+    if (cache.has(n)) {
+      console.log(`from cache: ${n}`);
+      return cache.get(n)!;
     }
-    console.log('get from func');
-    const result = func(x);
 
-    cache.set(x, result);
+    if (n <= 1) {
+      cache.set(n, 1);
+      return 1;
+    }
+
+    const result = n * factorial(n - 1);
+    cache.set(n, result);
     return result;
-  };
+  }
+
+  return factorial;
 }
 
-const getFact = cachingDecorator(calculateFactorial);
+const getFact = memoizedFactorial();
 export default getFact;

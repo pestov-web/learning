@@ -2,7 +2,7 @@ import { useRef, useCallback, useState, useContext } from 'react';
 import getFact from '../utils/getFact';
 import FactResult from './FactResult';
 import { ThemeContext } from '../App';
-import React from "react";
+import React from 'react';
 
 function FactForm() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -13,13 +13,12 @@ function FactForm() {
     element.preventDefault();
     if (inputRef.current?.value) {
       const value = Number(inputRef.current.value);
-      // тут можно поменять валидацию на yup, регулярку итд
+      // тут можно в валидацию на yup, регулярку итд (ногами не бить =))
       if (value >= 0 && value <= 5000) {
         const result: number = getFact(value);
         setFactResult(result);
         inputRef.current.value = '';
       } else {
-        // O_o
         setFactResult('Введите целое число от 0 до 5000');
       }
     }
@@ -32,7 +31,7 @@ function FactForm() {
           Факториал
         </label>
         <input
-            id="number"
+          id="number"
           type="number"
           ref={inputRef}
           className={'input input_' + theme}
