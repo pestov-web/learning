@@ -2,6 +2,7 @@ import { useRef, useCallback, useState, useContext } from 'react';
 import getFact from '../utils/getFact';
 import FactResult from './FactResult';
 import { ThemeContext } from '../App';
+import React from "react";
 
 function FactForm() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,6 +32,7 @@ function FactForm() {
           Факториал
         </label>
         <input
+            id="number"
           type="number"
           ref={inputRef}
           className={'input input_' + theme}

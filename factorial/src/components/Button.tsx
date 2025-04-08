@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { ThemeContext } from '../App';
+import React from "react";
 interface ButtonProps {
   children: React.ReactNode;
   onClick: () => void;
