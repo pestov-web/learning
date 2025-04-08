@@ -19,6 +19,7 @@ function FactForm() {
         setFactResult(result);
         inputRef.current.value = '';
       } else {
+        // O_o
         setFactResult('Введите целое число от 0 до 5000');
       }
     }
