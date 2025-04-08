@@ -14,8 +14,7 @@ function FactForm() {
       const value = Number(inputRef.current.value);
       // тут можно поменять валидацию на yup, регулярку итд
       if (value >= 0 && value <= 5000) {
-        const num: number = value;
-        const result: number = getFact(num);
+        const result: number = getFact(value);
         setFactResult(result);
         inputRef.current.value = '';
       } else {
