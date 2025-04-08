@@ -11,10 +11,10 @@ function cachingDecorator(func: (x: number) => number) {
   return function (x: number) {
     if (cache.has(x)) {
       console.log('get from cache');
-      return cache.get(x) as number; // ниже тоже, как избежать использования as number, не указывая полотна типов и проверок при объявлении функции?
+      return cache.get(x);
     }
     console.log('get from func');
-    const result = func(x) as number;
+    const result = func(x);
 
     cache.set(x, result);
     return result;
