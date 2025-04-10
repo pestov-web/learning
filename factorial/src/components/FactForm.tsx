@@ -1,51 +1,38 @@
-import { useRef, useCallback, useState, useContext } from 'react';
-import getFact from '../utils/getFact';
+import { useContext, useState } from 'react';
 import FactResult from './FactResult';
 import { ThemeContext } from '../App';
-import React from 'react';
+
+
+function getResult(value: number) {
+    let res = 0;
+    for(let i =0; i< 1_000_000_000; i++) {
+        res = i;
+    }
+    return res - value;
+}
 
 function FactForm() {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [factResult, setFactResult] = useState<number | string | null>(null);
-  const theme = useContext(ThemeContext);
+    const theme = useContext(ThemeContext);
 
-  const handleSubmit = useCallback((element: React.FormEvent) => {
-    element.preventDefault();
-    if (inputRef.current?.value) {
-      const value = Number(inputRef.current.value);
-      // тут можно в валидацию на yup, регулярку итд (ногами не бить =))
-      if (value >= 0 && value <= 5000) {
-        const result: number = getFact(value);
-        setFactResult(result);
-        inputRef.current.value = '';
-      } else {
-        setFactResult('Введите целое число от 0 до 5000');
-      }
-    }
-  }, []);
+    const [value, setValue] = useState(0);
 
-  return (
-    <div className={'form-container form-container_' + theme}>
-      <form className="form">
-        <label htmlFor="number" className="form__label">
-          Факториал
-        </label>
-        <input
-          id="number"
-          type="number"
-          ref={inputRef}
-          className={'input input_' + theme}
-        />
-        <input
-          type="submit"
-          value="Вычислить"
-          className={'button button_' + theme}
-          onClick={handleSubmit}
-        />
-      </form>
-      <FactResult factResult={factResult} />
-    </div>
-  );
+
+    return (
+        <div className={'form-container form-container_' + theme}>
+            <div className="form">
+                <label className="form__label">
+                    Введите значение
+                </label>
+                <input value={value}
+                       className={'input input_' + theme}
+                       type='number'
+                       onChange={e => setValue(+e.target.value)}
+                />
+            </div>
+            <div>{getResult(value)}</div>
+            <FactResult factResult={0} />
+        </div>
+    );
 }
 
 export default FactForm;
